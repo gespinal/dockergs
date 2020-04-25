@@ -30,11 +30,10 @@ Vagrant.configure("2") do |config|
           node.vm.network "private_network", ip: managerIP+"#{number}"
           node.vm.hostname = "m#{number}"
           node.trigger.after :up do |trigger|
-            trigger.info = "Adding to /etc/hosts..."
+            trigger.info = "Adding manager to /etc/hosts..."
             trigger.run = {path: hostsScript, args: managerIP+"#{number} m#{number}"}
           end
         end
-
         # Workers
         config.vm.define "w#{number}", autostart: false do |node|
           node.vm.provider "virtualbox" do |vb|
@@ -42,10 +41,9 @@ Vagrant.configure("2") do |config|
           end
           node.vm.network "private_network", ip: workerIP+"#{number}"
           node.vm.hostname = "w#{number}"
-          node.vm.hostname = "m#{number}"
           node.trigger.after :up do |trigger|
-            trigger.info = "Adding to /etc/hosts..."
-            trigger.run = {path: "updateHosts.sh"}
+            trigger.info = "Adding worker to /etc/hosts..."
+            trigger.run = {path: hostsScript, args: managerIP+"#{number} w#{number}"}
           end
         end
     end
