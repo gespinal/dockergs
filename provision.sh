@@ -19,3 +19,4 @@ ntpdate ntp.ubuntu.com
 sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/$zone /etc/localtime
 
 systemctl daemon-reload && systemctl restart docker
+

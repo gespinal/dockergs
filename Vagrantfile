@@ -1,12 +1,13 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-myBox     = "bento/ubuntu-16.04"
-myRam     = 1024
-myCpu     = 1
-managerIP = "192.168.99.10"
-workerIP  = "192.168.99.20"
-script    = "provision.sh"
+myBox           = "bento/ubuntu-16.04"
+myRam           = 1024
+myCpu           = 1
+managerIP       = "192.168.99.10"
+workerIP        = "192.168.99.20"
+provisionScript = "provision.sh"
+hostsScript     = "updateHosts.sh"
 
 Vagrant.configure("2") do |config|
 
@@ -18,7 +19,7 @@ Vagrant.configure("2") do |config|
         vb.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000 ]
     end
 
-    config.vm.provision "shell", path: script, privileged: true
+    config.vm.provision "shell", path: provisionScript, privileged: true
 
     (1..3).each do |number|
         # Managers
@@ -26,8 +27,12 @@ Vagrant.configure("2") do |config|
           node.vm.provider "virtualbox" do |vb|
               vb.name = "m#{number}"
           end
-            node.vm.network "private_network", ip: managerIP+"#{number}"
-            node.vm.hostname = "m#{number}"
+          node.vm.network "private_network", ip: managerIP+"#{number}"
+          node.vm.hostname = "m#{number}"
+          node.trigger.after :up do |trigger|
+            trigger.info = "Adding to /etc/hosts..."
+            trigger.run = {path: hostsScript, args: managerIP+"#{number} m#{number}"}
+          end
         end
 
         # Workers
@@ -35,8 +40,13 @@ Vagrant.configure("2") do |config|
           node.vm.provider "virtualbox" do |vb|
               vb.name = "m#{number}"
           end
-            node.vm.network "private_network", ip: workerIP+"#{number}"
-            node.vm.hostname = "w#{number}"
+          node.vm.network "private_network", ip: workerIP+"#{number}"
+          node.vm.hostname = "w#{number}"
+          node.vm.hostname = "m#{number}"
+          node.trigger.after :up do |trigger|
+            trigger.info = "Adding to /etc/hosts..."
+            trigger.run = {path: "updateHosts.sh"}
+          end
         end
     end
 
