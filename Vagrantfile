@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
           node.vm.hostname = "w#{number}"
           node.trigger.after :up do |trigger|
             trigger.info = "Adding worker to /etc/hosts..."
-            trigger.run = {path: hostsScript, args: managerIP+"#{number} w#{number}"}
+            trigger.run = {path: hostsScript, args: workerIP+"#{number} w#{number}"}
           end
         end
     end
