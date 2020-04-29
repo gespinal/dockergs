@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
         # Workers
         config.vm.define "w#{number}", autostart: false do |node|
           node.vm.provider "virtualbox" do |vb|
-              vb.name = "m#{number}"
+              vb.name = "w#{number}"
           end
           node.vm.network "private_network", ip: workerIP+"#{number}"
           node.vm.hostname = "w#{number}"
